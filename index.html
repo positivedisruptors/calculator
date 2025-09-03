@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Agency Project Pricing Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+
+    .service-card {
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+    .service-card.selected {
+      border-color: #3B82F6;
+      background: linear-gradient(135deg, #EBF4FF 0%, #F0F9FF 100%);
+    }
+    .service-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    .price-display {
+      background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+      color: white;
+    }
+    .complexity-slider {
+      background: linear-gradient(to right, #10B981, #F59E0B, #EF4444);
+    }
+  </style>
+</head>
+<body class="bg-gradient-to-br from-slate-50 to-blue-50 min-h-screen">
+  <div class="container mx-auto px-4 py-8 max-w-6xl">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <h1 class="text-4xl font-bold text-gray-800 mb-4">Project Pricing Calculator</h1>
+      <p class="text-xl text-gray-600">Estimate your graphic design & digital marketing project costs</p>
+    </div>
+
+    <div class="grid lg:grid-cols-3 gap-8">
+      <!-- Services Selection -->
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-2xl shadow-lg p-8">
+          <h2 class="text-2xl font-semibold text-gray-800 mb-6">Select Services</h2>
+
+          <div class="grid md:grid-cols-2 gap-4 mb-8" id="servicesGrid"></div>
+
+          <!-- Project Complexity -->
+          <div class="mb-8">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Project Complexity</h3>
+            <div class="relative">
+              <input type="range" id="complexitySlider" min="1" max="3" value="2" 
+                class="w-full h-3 rounded-lg appearance-none cursor-pointer complexity-slider">
+              <div class="flex justify-between text-sm text-gray-600 mt-2">
+                <span>Simple</span>
+                <span>Standard</span>
+                <span>Complex</span>
+              </div>
+            </div>
+            <p class="text-gray-600 mt-2" id="complexityDescription">Standard complexity with moderate requirements</p>
+          </div>
+
+          <!-- Timeline -->
+          <div class="mb-8">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Project Timeline</h3>
+            <select id="timelineSelect" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+              <option value="1">Rush (1-2 weeks) - +50%</option>
+              <option value="0.8" selected>Standard (3-4 weeks)</option>
+              <option value="0.7">Extended (5-8 weeks) - 30% discount</option>
+            </select>
+          </div>
+
+          <!-- Additional Options -->
+          <div>
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Additional Options</h3>
+            <div class="space-y-3">
+              <label class="flex items-center">
+                <input type="checkbox" id="revisions" class="mr-3 w-4 h-4 text-blue-600">
+                <span>Extra Revisions (+$500)</span>
+              </label>
+              <label class="flex items-center">
+                <input type="checkbox" id="consultation" class="mr-3 w-4 h-4 text-blue-600">
+                <span>Strategy Consultation (+$800)</span>
+              </label>
+              <label class="flex items-center">
+                <input type="checkbox" id="maintenance" class="mr-3 w-4 h-4 text-blue-600">
+                <span>3-Month Maintenance (+$1,200)</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Price Summary -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-2xl shadow-lg p-8 sticky top-8">
+          <h2 class="text-2xl font-semibold text-gray-800 mb-6">Price Estimate</h2>
+
+          <div class="space-y-4 mb-6">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Base Services:</span>
+              <span class="font-semibold" id="basePrice">$0</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Complexity Multiplier:</span>
+              <span class="font-semibold" id="complexityMultiplier">1.0x</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Timeline Adjustment:</span>
+              <span class="font-semibold" id="timelineAdjustment">Standard</span>
+            </div>
+            <div class="flex justify-between">
+              <span class="text-gray-600">Add-ons:</span>
+              <span class="font-semibold" id="addonsPrice">$0</span>
+            </div>
+            <hr class="border-gray-300">
+          </div>
+
+          <div class="price-display rounded-xl p-6 text-center mb-6">
+            <div class="text-sm opacity-90 mb-2">Total Project Cost</div>
+            <div class="text-4xl font-bold" id="totalPrice">$0</div>
+            <div class="text-sm opacity-90 mt-2">Estimated Range: <span id="priceRange">$0 - $0</span></div>
+          </div>
+
+          <div class="space-y-3">
+            <button onclick="generateProposal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition duration-300">
+              Generate Proposal
+            </button>
+            <button onclick="resetCalculator()" class="w-full bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-3 px-6 rounded-lg transition duration-300">
+              Reset Calculator
+            </button>
+          </div>
+
+          <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+            <p class="text-sm text-blue-800">
+              <strong>Note:</strong> This is an estimate. Final pricing may vary based on specific requirements and scope changes.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const services = [
+      { id: 'logo', name: 'Logo Design', price: 1500, icon: '🎨' },
+      { id: 'branding', name: 'Brand Identity', price: 3500, icon: '✨' },
+      { id: 'website', name: 'Website Design', price: 5000, icon: '💻' },
+      { id: 'social', name: 'Social Media Kit', price: 1200, icon: '📱' },
+      { id: 'print', name: 'Print Materials', price: 800, icon: '📄' },
+      { id: 'packaging', name: 'Packaging Design', price: 2500, icon: '📦' },
+      { id: 'marketing', name: 'Marketing Campaign', price: 4000, icon: '📈' },
+      { id: 'seo', name: 'SEO Strategy', price: 2000, icon: '🔍' }
+    ];
+
+    const complexityDescriptions = {
+      1: 'Simple project with basic requirements',
+      2: 'Standard complexity with moderate requirements',
+      3: 'Complex project with advanced features and custom work'
+    };
+
+    const complexityMultipliers = { 1: 0.8, 2: 1.0, 3: 1.5 };
+
+    let selectedServices = new Set();
+
+    function initializeServices() {
+      const grid = document.getElementById('servicesGrid');
+      grid.innerHTML = services.map(service => `
+        <div id="card-${service.id}" class="service-card bg-white rounded-xl p-6 cursor-pointer shadow-md"
+             onclick="toggleService('${service.id}')">
+          <div class="text-3xl mb-3">${service.icon}</div>
+          <h4 class="font-semibold text-gray-800 mb-2">${service.name}</h4>
+          <p class="text-blue-600 font-bold">$${service.price.toLocaleString()}</p>
+        </div>
+      `).join('');
+    }
+
+    function toggleService(serviceId) {
+      const card = document.getElementById(`card-${serviceId}`);
+      if (selectedServices.has(serviceId)) {
+        selectedServices.delete(serviceId);
+        card.classList.remove('selected');
+      } else {
+        selectedServices.add(serviceId);
+        card.classList.add('selected');
+      }
+      updatePricing();
+    }
+
+    function updatePricing() {
+      let basePrice = 0;
+      selectedServices.forEach(serviceId => {
+        const service = services.find(s => s.id === serviceId);
+        basePrice += service.price;
+      });
+
+      const complexity = parseInt(document.getElementById('complexitySlider').value);
+      const complexityMult = complexityMultipliers[complexity];
+      const timelineAdj = parseFloat(document.getElementById('timelineSelect').value);
+
+      let addonsPrice = 0;
+      if (document.getElementById('revisions').checked) addonsPrice += 500;
+      if (document.getElementById('consultation').checked) addonsPrice += 800;
+      if (document.getElementById('maintenance').checked) addonsPrice += 1200;
+
+      const adjustedBasePrice = basePrice * complexityMult * timelineAdj;
+      const totalPrice = adjustedBasePrice + addonsPrice;
+
+      document.getElementById('basePrice').textContent = `$${basePrice.toLocaleString()}`;
+      document.getElementById('complexityMultiplier').textContent = `${complexityMult}x`;
+      document.getElementById('timelineAdjustment').textContent =
+        timelineAdj === 1 ? '+50%' : timelineAdj === 0.8 ? 'Standard' : '-30%';
+      document.getElementById('addonsPrice').textContent = `$${addonsPrice.toLocaleString()}`;
+      document.getElementById('totalPrice').textContent = `$${Math.round(totalPrice).toLocaleString()}`;
+
+      const rangeMin = Math.round(totalPrice * 0.85);
+      const rangeMax = Math.round(totalPrice * 1.15);
+      document.getElementById('priceRange').textContent = `$${rangeMin.toLocaleString()} - $${rangeMax.toLocaleString()}`;
+    }
+
+    function updateComplexityDescription() {
+      const complexity = parseInt(document.getElementById('complexitySlider').value);
+      document.getElementById('complexityDescription').textContent = complexityDescriptions[complexity];
+      updatePricing();
+    }
+
+    function generateProposal() {
+      if (selectedServices.size === 0) {
+        alert('Please select at least one service to generate a proposal.');
+        return;
+      }
+
+      const selectedServiceNames = Array.from(selectedServices).map(id => 
+        services.find(s => s.id === id).name
+      ).join(', ');
+
+      const totalPrice = document.getElementById('totalPrice').textContent;
+      const complexity = document.getElementById('complexitySlider').value;
+      const complexityText = complexityDescriptions[complexity];
+
+      alert(`Proposal Generated!\n\nServices: ${selectedServiceNames}\nComplexity: ${complexityText}\nEstimated Cost: ${totalPrice}\n\nThis proposal has been prepared for your client presentation.`);
+    }
+
+    function resetCalculator() {
+      selectedServices.clear();
+      document.querySelectorAll('.service-card').forEach(card => {
+        card.classList.remove('selected');
+      });
+      document.getElementById('complexitySlider').value = 2;
+      document.getElementById('timelineSelect').value = 0.8;
+      document.getElementById('revisions').checked = false;
+      document.getElementById('consultation').checked = false;
+      document.getElementById('maintenance').checked = false;
+      updateComplexityDescription();
+      updatePricing();
+    }
+
+    // Event listeners
+    document.getElementById('complexitySlider').addEventListener('input', updateComplexityDescription);
+    document.getElementById('timelineSelect').addEventListener('change', updatePricing);
+    document.getElementById('revisions').addEventListener('change', updatePricing);
+    document.getElementById('consultation').addEventListener('change', updatePricing);
+    document.getElementById('maintenance').addEventListener('change', updatePricing);
+
+    // Initialize
+    initializeServices();
+    updateComplexityDescription();
+  </script>
+</body>
+</html>
