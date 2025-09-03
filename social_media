@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Social Media Options</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 font-sans min-h-screen flex flex-col items-center justify-center p-6">
+  <div class="bg-white shadow-lg rounded-2xl p-8 max-w-lg w-full">
+    <h1 class="text-2xl font-bold mb-6 text-center">📱 Social Media Plans</h1>
+    
+    <div class="space-y-4">
+      <button onclick="selectPlan('easy')" id="btn-easy" class="w-full p-4 border rounded-lg hover:bg-green-100">Easy 🌱 (3 posts/week)</button>
+      <button onclick="selectPlan('medium')" id="btn-medium" class="w-full p-4 border rounded-lg hover:bg-yellow-100">Medium ⚡ (5 posts/week)</button>
+      <button onclick="selectPlan('hard')" id="btn-hard" class="w-full p-4 border rounded-lg hover:bg-red-100">Hard 🔥 (7 posts/week)</button>
+    </div>
+
+    <div class="mt-6 bg-gray-100 rounded-lg p-4">
+      <h2 class="text-xl font-semibold mb-2">Plan Details</h2>
+      <p id="planName" class="text-gray-800">Select a plan above</p>
+      <p id="postsPerWeek" class="text-gray-700"></p>
+      <p id="postsPerMonth" class="text-gray-700"></p>
+      <p id="estimatedCost" class="text-gray-700 font-bold mt-2"></p>
+    </div>
+  </div>
+
+  <script>
+    const plans = {
+      easy: { name: "Easy 🌱", postsPerWeek: 3, costPerPost: 20 },
+      medium: { name: "Medium ⚡", postsPerWeek: 5, costPerPost: 18 },
+      hard: { name: "Hard 🔥", postsPerWeek: 7, costPerPost: 15 }
+    };
+
+    function selectPlan(level) {
+      const plan = plans[level];
+      const postsPerMonth = plan.postsPerWeek * 4; // simple 4 weeks assumption
+      const cost = postsPerMonth * plan.costPerPost;
+
+      document.getElementById("planName").textContent = plan.name;
+      document.getElementById("postsPerWeek").textContent = `Posts per week: ${plan.postsPerWeek}`;
+      document.getElementById("postsPerMonth").textContent = `Approx. posts per month: ${postsPerMonth}`;
+      document.getElementById("estimatedCost").textContent = `Estimated monthly cost: $${cost}`;
+      
+      // highlight active button
+      ["easy","medium","hard"].forEach(id=>{
+        document.getElementById("btn-"+id).classList.remove("bg-green-200","bg-yellow-200","bg-red-200");
+      });
+      if(level==="easy") document.getElementById("btn-easy").classList.add("bg-green-200");
+      if(level==="medium") document.getElementById("btn-medium").classList.add("bg-yellow-200");
+      if(level==="hard") document.getElementById("btn-hard").classList.add("bg-red-200");
+    }
+  </script>
+</body>
+</html>
